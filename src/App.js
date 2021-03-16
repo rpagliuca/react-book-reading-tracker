@@ -20,26 +20,16 @@ function Main({token}) {
 
   return (
     <rs.Container>
-      <ConnectedFormLogin
-        setError={setError}
-      />
+      <ConnectedFormLogin/>
       {token && (
         <>
         <ConnectedFormAddEntry
-          shouldFetch={shouldFetch}
-          setShouldFetch={setShouldFetch}
           data={data}
           setData={setData}
-          error={error}
-          setError={setError}
         />
         <ConnectedPastEntries
-          shouldFetch={shouldFetch}
-          setShouldFetch={setShouldFetch}
           data={data}
           setData={setData}
-          error={error}
-          setError={setError}
         />
         </>
       )}
@@ -58,7 +48,7 @@ function useInput(placeholder) {
 
 const ConnectedFormAddEntry = connectWithToken(FormAddEntry);
 
-function FormAddEntry({token, shouldFetch, setShouldFetch, data, setData, error, setError}) {
+function FormAddEntry({token, data, setData}) {
 
   const [livroInput, livroValue, setLivroValue] = useInput("Livro");
   const [inicioHorarioInput, inicioHorarioValue, setInicioHorarioValue] = useInput("Horário");
@@ -74,7 +64,7 @@ function FormAddEntry({token, shouldFetch, setShouldFetch, data, setData, error,
       start_location: parseInt(inicioPaginaValue, 10) || null,
       end_location: parseInt(fimPaginaValue, 10) || null
     }
-    addEntry(token, entry, data, setData, error, setError);
+    addEntry(token, entry, data, setData);
 
     setLivroValue("");
     setInicioHorarioValue("");
@@ -133,17 +123,22 @@ const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com
 
 const ConnectedPastEntries = connectWithToken(PastEntries);
 
-function PastEntries({token, shouldFetch, setShouldFetch, data, setData, error, setError}) {
+function PastEntries({token, data, setData}) {
+
+  const [shouldFetch, setShouldFetch] = useState(true);
 
   useEffect(() => {
     if (token) {
-      fetchEntries(token, data, setData, shouldFetch, setShouldFetch, error, setError);
+      if (!shouldFetch) {
+        return;
+      }
+      setShouldFetch(false);
+      fetchEntries(token, data, setData);
     }
-  }, [token, data, setData, shouldFetch, setShouldFetch, error, setError]);
+  }, [token, data, setData, shouldFetch, setShouldFetch]);
 
   return (
     <>
-    {error && error.message && <p>{error.message}</p>}
     <rs.Table>
       <thead>
         <tr>
@@ -164,8 +159,6 @@ function PastEntries({token, shouldFetch, setShouldFetch, data, setData, error, 
               key={i.id}
               data={data}
               setData={setData}
-              error={error}
-              setError={setError}
             />
           ))}
         </tbody>
@@ -224,13 +217,7 @@ function addEntry(token, entry, data, setData, error, setError) {
   fetch(req).then(resp => resp.json().then(d => onSuccess(d))).catch(e => setError(e));
 }
 
-function fetchEntries(token, data, setData, shouldFetch, setShouldFetch, error, setError) {
-
-  if (!shouldFetch) {
-    return;
-  }
-
-  setShouldFetch(false);
+function fetchEntries(token, data, setData) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -239,7 +226,7 @@ function fetchEntries(token, data, setData, shouldFetch, setShouldFetch, error, 
     headers: headers
   }); 
 
-  fetch(req).then(resp => resp.json().then(d => setData(d))).catch(e => setError(e));
+  fetch(req).then(resp => resp.json().then(d => setData(d)));
 }
 
 function deleteEntry(token, id, data, setData, error, setError) {
