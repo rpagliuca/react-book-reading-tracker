@@ -1,0 +1,34 @@
+body {
+    background: white;
+    color: black;
+    margin-top: 20px;
+}
+
+.card-title {
+    color: #FBC117;
+    font-weight: bolder;
+    font-size: 140%;
+}
+
+.card {
+    background: #3F9784;
+    color: white;
+    margin-bottom: 20px;
+}
+
+b {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 90%;
+}
+
+.position-negative {
+    background: #A32632;
+}
+
+.internal-card {
+    background: rgba(255,255,255,.1);
+}
+
+.row {
+    margin-bottom: 20px;
+}
