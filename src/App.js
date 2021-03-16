@@ -9,28 +9,26 @@ function App() {
 }
 
 const connectWithToken = fn => connect((state) => {return {token: state.token}})(fn);
+const connectWithData = fn => connect((state) => {return {data: state.data}})(fn);
 
 const ConnectedMain = connectWithToken(Main);
 
-function Main({token}) {
+const setData = (dispatch, data) => {
+  dispatch({
+    type: store.TYPE_UPDATE_DATA,
+    data: data
+  });
+}
 
-  const [shouldFetch, setShouldFetch] = useState(true);
-  const [data, setData] = useState([]);
-  const [error, setError] = useState({});
+function Main({token}) {
 
   return (
     <rs.Container>
       <ConnectedFormLogin/>
       {token && (
         <>
-        <ConnectedFormAddEntry
-          data={data}
-          setData={setData}
-        />
-        <ConnectedPastEntries
-          data={data}
-          setData={setData}
-        />
+        <ConnectedFormAddEntry/>
+        <ConnectedPastEntries/>
         </>
       )}
     </rs.Container>
@@ -46,9 +44,9 @@ function useInput(placeholder) {
   ]
 }
 
-const ConnectedFormAddEntry = connectWithToken(FormAddEntry);
+const ConnectedFormAddEntry = connectWithData(connectWithToken(FormAddEntry));
 
-function FormAddEntry({token, data, setData}) {
+function FormAddEntry({token, data, dispatch}) {
 
   const [livroInput, livroValue, setLivroValue] = useInput("Livro");
   const [inicioHorarioInput, inicioHorarioValue, setInicioHorarioValue] = useInput("Horário");
@@ -64,7 +62,7 @@ function FormAddEntry({token, data, setData}) {
       start_location: parseInt(inicioPaginaValue, 10) || null,
       end_location: parseInt(fimPaginaValue, 10) || null
     }
-    addEntry(token, entry, data, setData);
+    addEntry(token, entry, data, dispatch);
 
     setLivroValue("");
     setInicioHorarioValue("");
@@ -121,9 +119,9 @@ function FormAddEntry({token, data, setData}) {
 
 const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/entries";
 
-const ConnectedPastEntries = connectWithToken(PastEntries);
+const ConnectedPastEntries = connectWithData(connectWithToken(PastEntries));
 
-function PastEntries({token, data, setData}) {
+function PastEntries({token, data, dispatch}) {
 
   const [shouldFetch, setShouldFetch] = useState(true);
 
@@ -133,9 +131,9 @@ function PastEntries({token, data, setData}) {
         return;
       }
       setShouldFetch(false);
-      fetchEntries(token, data, setData);
+      fetchEntries(token, data, dispatch);
     }
-  }, [token, data, setData, shouldFetch, setShouldFetch]);
+  }, [token, data, shouldFetch, setShouldFetch, dispatch]);
 
   return (
     <>
@@ -153,12 +151,10 @@ function PastEntries({token, data, setData}) {
       {(data && data.length && (
         <tbody>
           {data.map(i => (
-            <Entry
+            <ConnectedEntry
               token={token}
               entry={i}
               key={i.id}
-              data={data}
-              setData={setData}
             />
           ))}
         </tbody>
@@ -169,11 +165,13 @@ function PastEntries({token, data, setData}) {
 
 }
 
-function Entry({token, entry, data, setData, error, setError}) {
+const ConnectedEntry = connectWithData(Entry);
+
+function Entry({token, entry, data, dispatch}) {
 
   const handleClick = (e, id) => {
     if (id) {
-      deleteEntry(token, id, data, setData, error, setError);
+      deleteEntry(token, id, data, dispatch);
     };
     e.preventDefault();
   };
@@ -192,7 +190,7 @@ function Entry({token, entry, data, setData, error, setError}) {
 
 export default App;
 
-function addEntry(token, entry, data, setData, error, setError) {
+function addEntry(token, entry, data, dispatch) {
 
     const headers = new Headers();
     headers.append("Authorization", "Bearer " + token);
@@ -208,16 +206,16 @@ function addEntry(token, entry, data, setData, error, setError) {
   const onSuccess = d => {
     if (d.success) {
       const newData = [...data];
-      entry.id = data.id;
+      entry.id = d.id;
       newData.push(entry);
-      setData(newData);
+      setData(dispatch, newData);
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d))).catch(e => setError(e));
+  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
 }
 
-function fetchEntries(token, data, setData) {
+function fetchEntries(token, data, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -226,10 +224,10 @@ function fetchEntries(token, data, setData) {
     headers: headers
   }); 
 
-  fetch(req).then(resp => resp.json().then(d => setData(d)));
+  fetch(req).then(resp => resp.json().then(d => setData(dispatch, d)));
 }
 
-function deleteEntry(token, id, data, setData, error, setError) {
+function deleteEntry(token, id, data, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -242,14 +240,14 @@ function deleteEntry(token, id, data, setData, error, setError) {
   const onSuccess = d => {
     if (d.success) {
       const newData = data.filter(i => i.id !== id);
-      setData(newData);
+      setData(dispatch, newData);
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d))).catch(e => setError(e));
+  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
 }
 
-const ConnectedFormLogin = connect()(FormLogin);
+const ConnectedFormLogin = connectWithToken(FormLogin);
 
 const updateToken = token => {
   return {
@@ -258,7 +256,7 @@ const updateToken = token => {
   }
 }
 
-function FormLogin({token, setError, dispatch}) {
+function FormLogin({token, dispatch}) {
 
   const [usernameInput, usernameValue, setUsernameValue] = useInput("Usuário");
   const [passwordInput, passwordValue, setPasswordValue] = useInput("Senha");
@@ -275,6 +273,7 @@ function FormLogin({token, setError, dispatch}) {
     e.preventDefault();
   };
 
+  if (!token) {
   return (
     <rs.Form onSubmit={handleSubmit}>
 
@@ -285,16 +284,27 @@ function FormLogin({token, setError, dispatch}) {
         <rs.Col sm={5}>
           {passwordInput}
         </rs.Col>
-        <rs.Col sm={1}>
+        <rs.Col sm={2}>
           <rs.Button>Login</rs.Button>
         </rs.Col>
-        <rs.Col sm={1}>
+      </rs.Row>
+
+    </rs.Form>
+  );
+  } else {
+
+  return (
+    <rs.Form onSubmit={handleSubmit}>
+
+      <rs.Row>
+        <rs.Col sm={12}>
           <rs.Button onClick={() => dispatch(updateToken("")) }>Logout</rs.Button>
         </rs.Col>
       </rs.Row>
 
     </rs.Form>
-  )
+  );
+  }
 }
 
 const LOGIN_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/login";
