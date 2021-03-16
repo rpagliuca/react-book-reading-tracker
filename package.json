@@ -36,8 +36,7 @@
     ]
   },
   "devDependencies": {
-    "gh-pages": "^1.2.0",
-    "redux-devtools": "^3.7.0"
+    "gh-pages": "^1.2.0"
   },
   "homepage": "http://rpagliuca.github.io/react-book-reading-tracker/"
 }
