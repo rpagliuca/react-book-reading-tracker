@@ -1,25 +1,31 @@
 import * as rs from 'reactstrap';
 
 import React, { useEffect, useState } from 'react';
+import { connect } from 'react-redux';
+import * as store from './app/store.js';
 
 function App() {
+  return <ConnectedMain/>
+}
+
+const connectWithToken = fn => connect((state) => {return {token: state.token}})(fn);
+
+const ConnectedMain = connectWithToken(Main);
+
+function Main({token}) {
 
   const [shouldFetch, setShouldFetch] = useState(true);
   const [data, setData] = useState([]);
   const [error, setError] = useState({});
-  const [token, setToken] = useState(false);
 
   return (
     <rs.Container>
-      <FormLogin
-        token={token}
-        setToken={setToken}
+      <ConnectedFormLogin
         setError={setError}
       />
       {token && (
         <>
-        <FormAddEntry
-          token={token}
+        <ConnectedFormAddEntry
           shouldFetch={shouldFetch}
           setShouldFetch={setShouldFetch}
           data={data}
@@ -27,8 +33,7 @@ function App() {
           error={error}
           setError={setError}
         />
-        <PastEntries
-          token={token}
+        <ConnectedPastEntries
           shouldFetch={shouldFetch}
           setShouldFetch={setShouldFetch}
           data={data}
@@ -50,6 +55,8 @@ function useInput(placeholder) {
     setValue,
   ]
 }
+
+const ConnectedFormAddEntry = connectWithToken(FormAddEntry);
 
 function FormAddEntry({token, shouldFetch, setShouldFetch, data, setData, error, setError}) {
 
@@ -123,6 +130,8 @@ function FormAddEntry({token, shouldFetch, setShouldFetch, data, setData, error,
 }
 
 const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/entries";
+
+const ConnectedPastEntries = connectWithToken(PastEntries);
 
 function PastEntries({token, shouldFetch, setShouldFetch, data, setData, error, setError}) {
 
@@ -253,13 +262,25 @@ function deleteEntry(token, id, data, setData, error, setError) {
   fetch(req).then(resp => resp.json().then(d => onSuccess(d))).catch(e => setError(e));
 }
 
-function FormLogin({token, setToken, setError}) {
+const ConnectedFormLogin = connect()(FormLogin);
+
+const updateToken = token => {
+  return {
+    type: store.TYPE_UPDATE_TOKEN,
+    token: token
+  }
+}
+
+function FormLogin({token, setError, dispatch}) {
 
   const [usernameInput, usernameValue, setUsernameValue] = useInput("Usuário");
   const [passwordInput, passwordValue, setPasswordValue] = useInput("Senha");
 
   const handleSubmit = (e) => {
-    getToken(usernameValue, passwordValue, setToken, setError);
+
+    getToken(usernameValue, passwordValue).then(token => {
+      dispatch(updateToken(token))
+    });
 
     setUsernameValue("");
     setPasswordValue("");
@@ -281,7 +302,7 @@ function FormLogin({token, setToken, setError}) {
           <rs.Button>Login</rs.Button>
         </rs.Col>
         <rs.Col sm={1}>
-          <rs.Button onClick={() => setToken("") }>Logout</rs.Button>
+          <rs.Button onClick={() => dispatch(updateToken("")) }>Logout</rs.Button>
         </rs.Col>
       </rs.Row>
 
@@ -291,21 +312,15 @@ function FormLogin({token, setToken, setError}) {
 
 const LOGIN_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/login";
 
-function getToken(username, password, setToken, setError) {
-
-  const onSuccess = d => {
-    setToken(d.token);
-  };
-
-  fetch(LOGIN_ENDPOINT, {
+async function getToken(username, password) {
+  const resp = await fetch(LOGIN_ENDPOINT, {
     method: "POST",
     body: JSON.stringify({
       "username": username,
       "password": password
     }),
-  })
-    .then(resp =>
-      resp.json().then(d => onSuccess(d))
-    )
-    .catch(e => setError(e));
+  });
+
+  const data = await resp.json()
+  return data.token
 }
