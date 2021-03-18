@@ -4,6 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import * as store from './app/store.js';
 
+import { GoogleLogin } from 'react-google-login';
+
 function App() {
   return <ConnectedMain/>
 }
@@ -17,6 +19,13 @@ const setData = (dispatch, data) => {
   dispatch({
     type: store.TYPE_UPDATE_DATA,
     data: data
+  });
+}
+
+const addError = (dispatch, error) => {
+  dispatch({
+    type: store.TYPE_ADD_ERROR,
+    error: error
   });
 }
 
@@ -258,8 +267,56 @@ const updateToken = token => {
 
 function FormLogin({token, dispatch}) {
 
+  const onGoogleLoginSuccess = response => {
+    dispatch(updateToken(response.tokenId))
+  }
+
+  const onGoogleLoginFailure = response => {
+    dispatch(addError("Erro ao fazer login com Google"))
+  }
+
+  if (!token) {
+  return (
+      <rs.Row>
+        <rs.Col md={{size: 2, offset: 5}}>
+          <GoogleLogin
+            clientId="656765689994-f29hh63in3j1362mom3ek00ukcmru8jq.apps.googleusercontent.com"
+            buttonText="Login"
+            onSuccess={onGoogleLoginSuccess}
+            onFailure={onGoogleLoginFailure}
+            cookiePolicy={'single_host_origin'}
+          />
+        </rs.Col>
+      </rs.Row>
+  );
+  } else {
+
+  return (
+    <rs.Form>
+
+      <rs.Row>
+        <rs.Col md={{size: 2, offset: 5}}>
+          <rs.Button onClick={() => dispatch(updateToken("")) }>Logout</rs.Button>
+        </rs.Col>
+      </rs.Row>
+
+    </rs.Form>
+  );
+  }
+}
+
+function OldFormLogin({token, dispatch}) {
+
   const [usernameInput, usernameValue, setUsernameValue] = useInput("Usuário");
   const [passwordInput, passwordValue, setPasswordValue] = useInput("Senha");
+
+  const onGoogleLoginSuccess = response => {
+    dispatch(updateToken(response.tokenId))
+  }
+
+  const onGoogleLoginFailure = response => {
+    dispatch(addError("Erro ao fazer login com Google"))
+  }
 
   const handleSubmit = (e) => {
 
@@ -275,7 +332,16 @@ function FormLogin({token, dispatch}) {
 
   if (!token) {
   return (
+
     <rs.Form onSubmit={handleSubmit}>
+      
+      <GoogleLogin
+        clientId="656765689994-f29hh63in3j1362mom3ek00ukcmru8jq.apps.googleusercontent.com"
+        buttonText="Login"
+        onSuccess={onGoogleLoginSuccess}
+        onFailure={onGoogleLoginFailure}
+        cookiePolicy={'single_host_origin'}
+      />
 
       <rs.Row>
         <rs.Col sm={5}>
