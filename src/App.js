@@ -128,6 +128,7 @@ function FormAddEntry({token, data, dispatch}) {
     setInicioDataValue("");
     setInicioHorarioValue("");
     setInicioPaginaValue("");
+    setFimDataValue("");
     setFimHorarioValue("");
     setFimPaginaValue("");
     setJaComeceiValue(false);
@@ -224,8 +225,8 @@ function PastEntries({token, data, dispatch}) {
       <thead>
         <tr>
           <th>Livro</th>
-          <th>Hora Início</th>
-          <th>Hora Fim</th>
+          <th>Comecei em</th>
+          <th>Parei em</th>
           <th>Pág. Início</th>
           <th>Pág. Fim</th>
           <th>Operações</th>
@@ -250,6 +251,26 @@ function PastEntries({token, data, dispatch}) {
 
 const ConnectedEntry = connectWithData(Entry);
 
+const pad = (num, len) => {
+    var str = num + "";
+    while (str.length < len) {
+        str = "0" + str;
+    }
+    return str;
+}
+
+const prettyDate = dateStr => {
+  const timestamp = Date.parse(dateStr);
+  if (timestamp) {
+    const date = new Date();
+    date.setTime(timestamp);
+    console.log(date);
+    return pad(date.getDate(), 2) + "/" + pad((date.getMonth()+1), 2) + "/" + date.getFullYear() + " "
+      + pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2);
+  }
+  return "";
+}
+
 function Entry({token, entry, data, dispatch}) {
 
   const handleClick = (e, id) => {
@@ -262,8 +283,8 @@ function Entry({token, entry, data, dispatch}) {
   return (
     <tr>
       <td>{entry.book_id}</td>
-      <td>{entry.start_time}</td>
-      <td>{entry.end_time}</td>
+      <td>{prettyDate(entry.start_time)}</td>
+      <td>{prettyDate(entry.end_time)}</td>
       <td>{entry.start_location}</td>
       <td>{entry.end_location}</td>
       <td><rs.Button color="light" onClick={(e) => handleClick(e, entry.id)}>🗑️</rs.Button></td>
