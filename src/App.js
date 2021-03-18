@@ -77,7 +77,6 @@ const ConnectedFormAddEntry = connectWithData(connectWithToken(FormAddEntry));
 const dateAndTimeToDate = (data, hora) => {
   var data_parts = data.split("/");
   var hora_parts = hora.split(":");
-  console.log(data_parts, hora_parts);
   var dt = new Date(
     parseInt(data_parts[2], 10), // ano
     parseInt(data_parts[1], 10) - 1, // mês começa com 0
@@ -264,7 +263,6 @@ const prettyDate = dateStr => {
   if (timestamp) {
     const date = new Date();
     date.setTime(timestamp);
-    console.log(date);
     return pad(date.getDate(), 2) + "/" + pad((date.getMonth()+1), 2) + "/" + date.getFullYear() + " "
       + pad(date.getHours(), 2) + ":" + pad(date.getMinutes(), 2);
   }
@@ -273,9 +271,16 @@ const prettyDate = dateStr => {
 
 function Entry({token, entry, data, dispatch}) {
 
-  const handleClick = (e, id) => {
+  const handleDelete = (e, id) => {
     if (id) {
       deleteEntry(token, id, data, dispatch);
+    };
+    e.preventDefault();
+  };
+
+  const handleStop = (e, entry) => {
+    if (entry.id) {
+      stopEntry(token, entry, data, dispatch);
     };
     e.preventDefault();
   };
@@ -287,7 +292,10 @@ function Entry({token, entry, data, dispatch}) {
       <td>{prettyDate(entry.end_time)}</td>
       <td>{entry.start_location}</td>
       <td>{entry.end_location}</td>
-      <td><rs.Button color="light" onClick={(e) => handleClick(e, entry.id)}>🗑️</rs.Button></td>
+      <td>
+        <rs.Button color="light" onClick={(e) => handleDelete(e, entry.id)}>🗑️</rs.Button>
+        {!entry.end_time && <rs.Button color="light" onClick={(e) => handleStop(e, entry)}>⏱</rs.Button>}
+      </td>
     </tr>
   );
 }
@@ -329,6 +337,35 @@ function fetchEntries(token, data, dispatch) {
   }); 
 
   fetch(req).then(resp => resp.json().then(d => setData(dispatch, d)));
+}
+
+function stopEntry(token, entry, data, dispatch) {
+
+  const headers = new Headers();
+  headers.append("Authorization", "Bearer " + token);
+
+  const end_time = new Date().toISOString();
+
+  const req = new Request(ENTRIES_ENDPOINT + "/" + entry.id, {
+    method: "PATCH",
+    headers: headers,
+    body: JSON.stringify({
+      end_time: end_time
+    })
+  }); 
+
+  const onSuccess = d => {
+    if (d.success) {
+      const newData = [...data];
+      const idx = newData.findIndex(i => i.id === entry.id);
+      const newEntry = {...newData[idx]};
+      newEntry.end_time = end_time;
+      newData[idx] = newEntry;
+      setData(dispatch, newData);
+    }
+  };
+
+  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
 }
 
 function deleteEntry(token, id, data, dispatch) {
