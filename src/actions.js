@@ -23,3 +23,5 @@ export const addError = (dispatch, error) => {
 }
 
 export const connectWithToken = fn => connect((state) => {return {token: state.token}})(fn);
+export const connectWithData = fn => connect((state) => {return {data: state.data}})(fn);
+

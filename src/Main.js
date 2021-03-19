@@ -1,6 +1,7 @@
 import * as rs from 'reactstrap';
 
-import { ConnectedFormAddEntry, ConnectedPastEntries } from './App.js'
+import { ConnectedFormAddEntry } from './FormAddEntry.js'
+import { ConnectedPastEntries } from './PastEntries.js'
 import { ConnectedFormLogin } from './FormLogin.js'
 import { connect } from 'react-redux';
 
