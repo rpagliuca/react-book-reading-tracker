@@ -1,7 +1,7 @@
 import * as rs from 'reactstrap';
 import { ConnectedEditableProperty } from './EditableProperty.js';
-import { deleteEntry, stopEntry } from './api.js';
-import { connectWithData } from './actions.js';
+import { deleteEntry, stopEntry } from './../model/api.js';
+import { connectWithData } from './../model/actions.js';
 
 export const ConnectedEntry = connectWithData(Entry);
 

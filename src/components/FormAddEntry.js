@@ -1,7 +1,7 @@
 import * as rs from 'reactstrap';
-import { addEntry } from './api.js';
-import { connectWithData, connectWithToken } from './actions.js';
-import { useInput, useCheckbox } from './hooks.js';
+import { addEntry } from './../model/api.js';
+import { connectWithData, connectWithToken } from './../model/actions.js';
+import { useInput, useCheckbox } from './../model/hooks.js';
 
 export const ConnectedFormAddEntry = connectWithData(connectWithToken(FormAddEntry));
 

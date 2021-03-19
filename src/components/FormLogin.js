@@ -1,8 +1,8 @@
 import * as rs from 'reactstrap';
-import { addError, setData, updateToken } from './actions.js';
-import { connectWithToken } from './actions.js';
+import { addError, setData, updateToken } from './../model/actions.js';
+import { connectWithToken } from './../model/actions.js';
 import { GoogleLogin } from 'react-google-login';
-import { fetchEntries } from './api.js';
+import { fetchEntries } from './../model/api.js';
 
 function FormLogin({token, dispatch}) {
 

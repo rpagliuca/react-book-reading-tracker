@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { ConnectedMain } from './Main.js';
+import { ConnectedMain } from './components/Main.js';
 
 function App() {
   return <ConnectedMain/>

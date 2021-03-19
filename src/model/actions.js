@@ -1,4 +1,4 @@
-import * as store from './app/store.js';
+import * as store from './store.js';
 import { connect } from 'react-redux';
 
 export const updateToken = token => {

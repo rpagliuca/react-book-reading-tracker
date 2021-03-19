@@ -1,8 +1,8 @@
 import * as rs from 'reactstrap';
 import React, { useEffect, useState } from 'react';
 import { ConnectedEntry } from './Entry.js';
-import { fetchEntries, } from './api.js';
-import { connectWithData, connectWithToken } from './actions.js';
+import { fetchEntries, } from './../model/api.js';
+import { connectWithData, connectWithToken } from './../model/actions.js';
 
 export const ConnectedPastEntries = connectWithData(connectWithToken(PastEntries));
 

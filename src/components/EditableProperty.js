@@ -1,7 +1,7 @@
 import * as rs from 'reactstrap';
 import React, { useRef, useEffect, useState } from 'react';
-import { patchProperty } from './api.js';
-import { connectWithToken } from './actions.js';
+import { patchProperty } from './../model/api.js';
+import { connectWithToken } from './../model/actions.js';
 export const ConnectedEditableProperty = connectWithToken(EditableProperty);
 
 function EditableProperty({token, entryId, propertyName, children, dataParser}) {
