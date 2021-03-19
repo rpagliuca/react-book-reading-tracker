@@ -1,6 +1,6 @@
 import * as rs from 'reactstrap';
 
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import * as store from './app/store.js';
 
@@ -53,13 +53,18 @@ function useInput(placeholder) {
   ]
 }
 
-function useCheckbox(label, start) {
+function useCheckbox(label, start, dependencies) {
   const [value, setValue] = useState(start)
+
+  const decoratedSetValue = value => {
+    dependencies.map(i => i(""));
+    setValue(value);
+  };
 
   const input = (
     <rs.FormGroup check>
       <rs.Label check>
-        <rs.Input type="checkbox" checked={value} onChange={(e) => setValue(e.target.checked)} />{' '}
+        <rs.Input type="checkbox" checked={value} onChange={(e) => decoratedSetValue(e.target.checked)} />{' '}
         {label}
       </rs.Label>
     </rs.FormGroup>
@@ -68,7 +73,7 @@ function useCheckbox(label, start) {
   return [
     input,
     value,
-    setValue,
+    decoratedSetValue,
   ]
 }
 
@@ -103,15 +108,17 @@ const TimeRFC3339 = (usarHorarioManual, retornarAgora, data, hora) => {
 
 function FormAddEntry({token, data, dispatch}) {
 
-  const [livroInput, livroValue, setLivroValue] = useInput("Livro");
-  const [inicioDataInput, inicioDataValue, setInicioDataValue] = useInput("Data (DD/MM/AAAA)");
-  const [inicioHorarioInput, inicioHorarioValue, setInicioHorarioValue] = useInput("Hora (HH:MM)");
-  const [inicioPaginaInput, inicioPaginaValue, setInicioPaginaValue] = useInput("Página");
   const [fimDataInput, fimDataValue, setFimDataValue] = useInput("Data (DD/MM/AAAA)");
   const [fimHorarioInput, fimHorarioValue, setFimHorarioValue] = useInput("Hora (HH:MM)");
-  const [fimPaginaInput, fimPaginaValue, setFimPaginaValue] = useInput("Página");
-  const [jaComeceiCheckbox, jaComeceiValue, setJaComeceiValue] = useCheckbox("Já comecei", false)
-  const [jaPareiCheckbox, jaPareiValue, setJaPareiValue] = useCheckbox("Já parei", false)
+  const [fimPaginaInput, fimPaginaValue, setFimPaginaValue] = useInput("Página em que parei");
+
+  const [inicioDataInput, inicioDataValue, setInicioDataValue] = useInput("Data (DD/MM/AAAA)");
+  const [inicioHorarioInput, inicioHorarioValue, setInicioHorarioValue] = useInput("Hora (HH:MM)");
+  const [jaPareiCheckbox, jaPareiValue, setJaPareiValue] = useCheckbox("Fim retroativo", false, [setFimDataValue, setFimHorarioValue, setFimPaginaValue])
+
+  const [livroInput, livroValue, setLivroValue] = useInput("Livro que vou ler agora");
+  const [inicioPaginaInput, inicioPaginaValue, setInicioPaginaValue] = useInput("Página em que vou começar");
+  const [jaComeceiCheckbox, jaComeceiValue, setJaComeceiValue] = useCheckbox("Início retroativo", false, [setInicioDataValue, setInicioHorarioValue, setJaPareiValue])
 
   const handleSubmit = (e) => {
     const entry = {
@@ -143,21 +150,23 @@ function FormAddEntry({token, data, dispatch}) {
         <rs.CardBody>
 
           <rs.Row>
-            <rs.Col sm={6}>
+            <rs.Col sm={4}>
                 {livroInput}
             </rs.Col>
-            <rs.Col sm={3}>
-              {jaComeceiCheckbox}
+
+            <rs.Col sm={4}>
+              {inicioPaginaInput}
             </rs.Col>
-            <rs.Col sm={3}>
-              {jaPareiCheckbox}
+
+            <rs.Col sm={2}>
+              {jaComeceiCheckbox}
             </rs.Col>
           </rs.Row>
 
 
           {jaComeceiValue && (
             <>
-          <rs.Badge color="warning">Início</rs.Badge>
+          <rs.Badge color="warning">Início retroativo</rs.Badge>
 
           <rs.Row>
             <rs.Col sm={3}>
@@ -166,16 +175,17 @@ function FormAddEntry({token, data, dispatch}) {
             <rs.Col sm={3}>
               {inicioHorarioInput}
             </rs.Col>
-            <rs.Col sm={6}>
-              {inicioPaginaInput}
+            <rs.Col sm={2}>
+              {jaPareiCheckbox}
             </rs.Col>
             </rs.Row>
             </>
+
             )}
 
           {jaPareiValue && (
             <>
-          <rs.Badge color="warning">Fim</rs.Badge>
+          <rs.Badge color="warning">Fim retroativo</rs.Badge>
           <rs.Row>
             <rs.Col sm={3}>
               {fimDataInput}
@@ -191,7 +201,7 @@ function FormAddEntry({token, data, dispatch}) {
           )}
 
 
-          <rs.Button>Adicionar</rs.Button>
+          <rs.Button color="dark">Adicionar registro</rs.Button>
 
         </rs.CardBody>
       </rs.Card>
@@ -214,9 +224,9 @@ function PastEntries({token, data, dispatch}) {
         return;
       }
       setShouldFetch(false);
-      fetchEntries(token, data, dispatch);
+      fetchEntries(token, dispatch);
     }
-  }, [token, data, shouldFetch, setShouldFetch, dispatch]);
+  }, [token, shouldFetch, setShouldFetch, dispatch]);
 
   return (
     <>
@@ -224,10 +234,10 @@ function PastEntries({token, data, dispatch}) {
       <thead>
         <tr>
           <th>Livro</th>
-          <th>Comecei em</th>
-          <th>Parei em</th>
-          <th>Pág. Início</th>
-          <th>Pág. Fim</th>
+          <th>Comecei às</th>
+          <th>Comecei na página</th>
+          <th>Parei às</th>
+          <th>Parei na página</th>
           <th>Operações</th>
         </tr>
       </thead>
@@ -287,16 +297,83 @@ function Entry({token, entry, data, dispatch}) {
 
   return (
     <tr>
-      <td>{entry.book_id}</td>
-      <td>{prettyDate(entry.start_time)}</td>
-      <td>{prettyDate(entry.end_time)}</td>
-      <td>{entry.start_location}</td>
-      <td>{entry.end_location}</td>
+      <ConnectedEditableProperty entryId={entry.id} propertyName="book_id">
+        {entry.book_id}
+      </ConnectedEditableProperty>
+      <ConnectedEditableProperty entryId={entry.id} propertyName="start_time" dataParser={timeParser}>
+        {prettyDate(entry.start_time)}
+      </ConnectedEditableProperty>
+      <ConnectedEditableProperty entryId={entry.id} propertyName="start_location" dataParser={intParser}>
+        {entry.start_location}
+      </ConnectedEditableProperty>
+      <ConnectedEditableProperty entryId={entry.id} propertyName="end_time" dataParser={timeParser}>
+        {prettyDate(entry.end_time)}
+      </ConnectedEditableProperty>
+      <ConnectedEditableProperty entryId={entry.id} propertyName="end_location" dataParser={intParser}>
+        {entry.end_location}
+      </ConnectedEditableProperty>
       <td>
         <rs.Button color="light" onClick={(e) => handleDelete(e, entry.id)}>🗑️</rs.Button>
         {!entry.end_time && <rs.Button color="light" onClick={(e) => handleStop(e, entry)}>⏱</rs.Button>}
       </td>
     </tr>
+  );
+}
+
+const intParser = str => {
+  return parseInt(str, 10);
+};
+
+const timeParser = str => {
+  const parts = str.split(" "); // Esperado espaço vazio entre data e hora
+  try {
+    return dateAndTimeToDate(parts[0], parts[1]).toISOString();
+  } catch (e) {
+    return null;
+  }
+};
+
+const ConnectedEditableProperty = connectWithToken(EditableProperty);
+
+function EditableProperty({token, entryId, propertyName, children, dataParser}) {
+  const [value, setValue] = useState(children);
+  const [isEditing, setIsEditing] = useState(false);
+  const ref = useRef();
+
+  const handleClick = () => {
+    setIsEditing(!isEditing);
+  };
+  
+  const onSubmit = (e) => {
+    if (!dataParser) {
+      dataParser = (e) => e;
+    }
+    patchProperty(token, entryId, propertyName, dataParser(value));
+    setIsEditing(false);
+    e.preventDefault();
+  };
+
+  useEffect(() => {
+    if (isEditing) {
+      ref.current.focus();
+    };
+  });
+
+  const handleFocus = (event) => event.target.select();
+
+  return (
+    <>
+    {!isEditing && (
+      <td onClick={handleClick}>{value}</td>
+    )}
+    {isEditing && (
+      <td>
+        <rs.Form onSubmit={onSubmit}>
+          <rs.Input value={value} onChange={e => setValue(e.target.value)} innerRef={ref} onFocus={handleFocus}/>
+        </rs.Form>
+      </td>
+    )}
+    </>
   );
 }
 
@@ -327,7 +404,7 @@ function addEntry(token, entry, data, dispatch) {
   fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
 }
 
-function fetchEntries(token, data, dispatch) {
+function fetchEntries(token, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -423,16 +500,47 @@ function FormLogin({token, dispatch}) {
   );
   } else {
 
+  const handleRefresh = () => {
+    setData(dispatch, null)
+    fetchEntries(token, dispatch);
+  };
+
   return (
     <rs.Form>
 
       <rs.Row>
-        <rs.Col md={{size: 2, offset: 5}}>
-          <rs.Button onClick={() => dispatch(updateToken("")) }>Logout</rs.Button>
+        <rs.Col md={{size: 1, offset: 10}}>
+          <rs.Button onClick={handleRefresh} color="secondary">Atualizar</rs.Button>
+        </rs.Col>
+        <rs.Col md={{size: 1}}>
+          <rs.Button onClick={() => dispatch(updateToken(""))} color="secondary">Logout</rs.Button>
         </rs.Col>
       </rs.Row>
 
     </rs.Form>
   );
   }
+}
+
+function patchProperty(token, entryId, propertyName, value) {
+
+  const headers = new Headers();
+  headers.append("Authorization", "Bearer " + token);
+
+  const body = {};
+  body[propertyName] = value;
+
+  const req = new Request(ENTRIES_ENDPOINT + "/" + entryId, {
+    method: "PATCH",
+    headers: headers,
+    body: JSON.stringify(body)
+  }); 
+
+  const onSuccess = d => {
+    if (d.success) {
+      // Nothing to do yet
+    }
+  };
+
+  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
 }

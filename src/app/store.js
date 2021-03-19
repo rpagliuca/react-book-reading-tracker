@@ -8,7 +8,8 @@ const reducer = (state = {errors: [], token: null, data: null}, action) => {
   if (action.type === TYPE_UPDATE_TOKEN) {
     return {
       ...state,
-      token: action.token
+      token: action.token,
+      data: null
     }
   } else if (action.type === TYPE_UPDATE_DATA) {
     return {
