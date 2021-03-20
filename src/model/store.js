@@ -3,6 +3,7 @@ import { configureStore } from '@reduxjs/toolkit';
 export const TYPE_UPDATE_TOKEN = "TYPE_UPDATE_TOKEN";
 export const TYPE_UPDATE_DATA = "TYPE_UPDATE_DATA";
 export const TYPE_ADD_ERROR = "TYPE_ADD_ERROR";
+export const TYPE_CLEAR_ERRORS = "TYPE_CLEAR_ERRORS";
 export const TYPE_SHOW_LOADING = "TYPE_SHOW_LOADING";
 export const TYPE_STOP_LOADING = "TYPE_STOP_LOADING";
 
@@ -59,6 +60,10 @@ const reducer = (state = {errors: [], token: null, data: null}, action) => {
       ...state,
       data: data
     }
+  } else if (action.type === TYPE_CLEAR_ERRORS) {
+    newState = {...state};
+    newState.errors = [];
+    return newState;
   }
   return state
 }

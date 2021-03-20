@@ -1,8 +1,8 @@
 import * as rs from 'reactstrap';
-import { connectWithErrors } from './../model/actions.js';
+import { clearErrors, connectWithErrors } from './../model/actions.js';
 import React, { useState } from 'react';
 
-function Errors({errors}) {
+function Errors({errors, dispatch}) {
   const [expanded, setExpanded] = useState(false);
 
   if (!errors || !errors.length) {
@@ -19,12 +19,43 @@ function Errors({errors}) {
     setExpanded(!expanded);
   };
 
+  const handleClear = () => {
+    clearErrors(dispatch);
+  }
+
+  let isFirst = true;
+
   return (
-    <rs.ListGroup onClick={toggleExpanded}>
+    <>
+    <rs.Badge color="danger">Log de erros</rs.Badge>
+    <rs.ListGroup>
       {visibleErrors.length && visibleErrors.map(i => (
-        <rs.ListGroupItem>[{i.date}] {i.error}</rs.ListGroupItem>
+        <rs.ListGroupItem>
+          <rs.Row>
+            <rs.Col className="log-date" md={3}>
+              {i.date}
+            </rs.Col>
+            <rs.Col>
+              {i.error}
+            </rs.Col>
+            {isFirst && (
+              <>
+              {errors.length > 1 && (
+              <rs.Col md={2}>
+                <rs.Button onClick={toggleExpanded} color="light">{(!expanded && "Ver mais") || "Ver menos"}</rs.Button>
+              </rs.Col>
+              )}
+              <rs.Col md={2}>
+                <rs.Button color="warning" onClick={handleClear}>Limpar log</rs.Button>
+              </rs.Col>
+              </>
+            )}
+              {isFirst = false}
+            </rs.Row>
+          </rs.ListGroupItem>
       ))}
-    </rs.ListGroup>
+        </rs.ListGroup>
+    </>
   );
 }
 

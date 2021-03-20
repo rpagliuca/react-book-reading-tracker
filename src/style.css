@@ -36,3 +36,8 @@ b {
 .entry-loading {
     background: #BBB;
 }
+
+.log-date {
+    font-size: 90%;
+    color: gray;
+}

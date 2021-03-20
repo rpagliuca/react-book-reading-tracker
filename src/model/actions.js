@@ -39,6 +39,12 @@ export const addError = (dispatch, error) => {
   });
 }
 
+export const clearErrors = (dispatch) => {
+  dispatch({
+    type: store.TYPE_CLEAR_ERRORS
+  });
+}
+
 export const showLoading = (dispatch, entryId) => {
   const requestId = uuidv4();
 
