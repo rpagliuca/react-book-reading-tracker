@@ -9,7 +9,21 @@ export const updateToken = token => {
   }
 }
 
+const sort = data => {
+  if (!data || data.length == 0) {
+    return data;
+  }
+  const sorted = data.sort((a, b) => {
+    if (a.start_time < b.start_time) {
+      return 1;
+    }
+    return -1;
+  });
+  return sorted;
+};
+
 export const setData = (dispatch, data) => {
+  data = sort(data);
   dispatch({
     type: store.TYPE_UPDATE_DATA,
     data: data

@@ -5,7 +5,6 @@ import { connectWithData, connectWithToken } from './../model/actions.js';
 export const ConnectedEditableProperty = connectWithData(connectWithToken(EditableProperty));
 
 function EditableProperty({data, token, entryId, propertyName, children, dataParser, dispatch}) {
-  console.log(children);
   const [value, setValue] = useState(children);
   const [isEditing, setIsEditing] = useState(false);
   const ref = useRef();

@@ -22,7 +22,6 @@ const reducer = (state = {errors: [], token: null, data: null}, action) => {
       data: null
     }
   } else if (action.type === TYPE_UPDATE_DATA) {
-    console.log(data);
     return {
       ...state,
       data: action.data
