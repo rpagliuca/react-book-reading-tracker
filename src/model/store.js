@@ -18,7 +18,9 @@ const reducer = (state = {errors: [], token: null, data: null}, action) => {
     }
   } else if (action.type === TYPE_ADD_ERROR) {
     const newState = {...state};
-    newState.errors.push(action.error);
+    const errors = [...state.errors];
+    errors.push({error: action.error, date: action.date});
+    newState.errors = errors;
     return newState;
   }
   return state

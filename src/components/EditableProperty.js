@@ -4,7 +4,7 @@ import { patchProperty } from './../model/api.js';
 import { connectWithToken } from './../model/actions.js';
 export const ConnectedEditableProperty = connectWithToken(EditableProperty);
 
-function EditableProperty({token, entryId, propertyName, children, dataParser}) {
+function EditableProperty({token, entryId, propertyName, children, dataParser, dispatch}) {
   const [value, setValue] = useState(children);
   const [isEditing, setIsEditing] = useState(false);
   const ref = useRef();
@@ -17,7 +17,7 @@ function EditableProperty({token, entryId, propertyName, children, dataParser}) 
     if (!dataParser) {
       dataParser = (e) => e;
     }
-    patchProperty(token, entryId, propertyName, dataParser(value));
+    patchProperty(token, entryId, propertyName, dataParser(value), dispatch);
     setIsEditing(false);
     e.preventDefault();
   };
@@ -45,4 +45,3 @@ function EditableProperty({token, entryId, propertyName, children, dataParser}) 
     </>
   );
 }
-

@@ -1,4 +1,4 @@
-import { setData } from './actions.js';
+import { setData, addError } from './actions.js';
 
 const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/entries";
 
@@ -11,7 +11,10 @@ export function fetchEntries(token, dispatch) {
     headers: headers
   }); 
 
-  fetch(req).then(resp => resp.json().then(d => setData(dispatch, d)));
+  fetch(req)
+    .then(resp => resp.json())
+    .then(d => setData(dispatch, d))
+    .catch(e => addError(dispatch, e));
 }
 
 export function addEntry(token, entry, data, dispatch) {
@@ -33,10 +36,15 @@ export function addEntry(token, entry, data, dispatch) {
       entry.id = d.id;
       newData.push(entry);
       setData(dispatch, newData);
+    } else {
+      addError(dispatch, "Error onSuccess do addEntry");
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
+  fetch(req)
+    .then(resp => resp.json())
+    .then(d => onSuccess(d))
+    .catch(e => addError(dispatch, e));
 }
 
 export function stopEntry(token, entry, data, dispatch) {
@@ -62,10 +70,14 @@ export function stopEntry(token, entry, data, dispatch) {
       newEntry.end_time = end_time;
       newData[idx] = newEntry;
       setData(dispatch, newData);
+    } else {
+      addError(dispatch, "Error onSuccess do stopEntry");
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
+  fetch(req)
+    .then(resp => resp.json().then(d => onSuccess(d)))
+    .catch(e => addError(dispatch, e));
 }
 
 export function deleteEntry(token, id, data, dispatch) {
@@ -82,13 +94,18 @@ export function deleteEntry(token, id, data, dispatch) {
     if (d.success) {
       const newData = data.filter(i => i.id !== id);
       setData(dispatch, newData);
+    } else {
+      addError(dispatch, "Error onSuccess do deleteEntry");
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
+  fetch(req)
+    .then(resp => resp.json())
+    .then(d => onSuccess(d))
+    .catch(e => addError(dispatch, e));
 }
 
-export function patchProperty(token, entryId, propertyName, value) {
+export function patchProperty(token, entryId, propertyName, value, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -105,8 +122,13 @@ export function patchProperty(token, entryId, propertyName, value) {
   const onSuccess = d => {
     if (d.success) {
       // Nothing to do yet
+    } else {
+      addError(dispatch, "error onsuccess do patchproperty");
     }
   };
 
-  fetch(req).then(resp => resp.json().then(d => onSuccess(d)));
+  fetch(req)
+    .then(resp => resp.json())
+    .then(d => onSuccess(d))
+    .catch(e => addError(dispatch, e));
 }
