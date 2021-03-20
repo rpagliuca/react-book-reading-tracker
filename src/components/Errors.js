@@ -22,7 +22,7 @@ function Errors({errors}) {
   return (
     <rs.ListGroup onClick={toggleExpanded}>
       {visibleErrors.length && visibleErrors.map(i => (
-        <rs.ListGroupItem>[{i.date.toISOString()}] {i.error}</rs.ListGroupItem>
+        <rs.ListGroupItem>[{i.date}] {i.error}</rs.ListGroupItem>
       ))}
     </rs.ListGroup>
   );

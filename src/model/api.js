@@ -1,4 +1,4 @@
-import { setData, addError } from './actions.js';
+import { showLoading, setData, addError } from './actions.js';
 
 const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/entries";
 
@@ -63,21 +63,27 @@ export function stopEntry(token, entry, data, dispatch) {
   }); 
 
   const onSuccess = d => {
+    console.log("haia");
     if (d.success) {
       const newData = [...data];
       const idx = newData.findIndex(i => i.id === entry.id);
       const newEntry = {...newData[idx]};
       newEntry.end_time = end_time;
       newData[idx] = newEntry;
+      console.log(newEntry);
       setData(dispatch, newData);
     } else {
       addError(dispatch, "Error onSuccess do stopEntry");
     }
   };
 
+  const stopLoading = showLoading(dispatch, entry.id);
+
   fetch(req)
-    .then(resp => resp.json().then(d => onSuccess(d)))
-    .catch(e => addError(dispatch, e));
+    .then(resp => resp.json())
+    .then(d => onSuccess(d))
+    .catch(e => addError(dispatch, e))
+    .finally(stopLoading);
 }
 
 export function deleteEntry(token, id, data, dispatch) {
@@ -99,13 +105,16 @@ export function deleteEntry(token, id, data, dispatch) {
     }
   };
 
+  const stopLoading = showLoading(dispatch, id);
+
   fetch(req)
     .then(resp => resp.json())
     .then(d => onSuccess(d))
-    .catch(e => addError(dispatch, e));
+    .catch(e => addError(dispatch, e))
+    .finally(stopLoading);
 }
 
-export function patchProperty(token, entryId, propertyName, value, dispatch) {
+export function patchProperty(data, token, entryId, propertyName, value, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
@@ -120,15 +129,25 @@ export function patchProperty(token, entryId, propertyName, value, dispatch) {
   }); 
 
   const onSuccess = d => {
+    console.log("haia");
     if (d.success) {
-      // Nothing to do yet
+      const newData = [...data];
+      const idx = newData.findIndex(i => i.id === entryId);
+      const newEntry = {...newData[idx]};
+      newEntry[propertyName] = value;
+      newData[idx] = newEntry;
+      console.log(newEntry);
+      setData(dispatch, newData);
     } else {
       addError(dispatch, "error onsuccess do patchproperty");
     }
   };
 
+  const stopLoading = showLoading(dispatch, entryId);
+
   fetch(req)
     .then(resp => resp.json())
     .then(d => onSuccess(d))
-    .catch(e => addError(dispatch, e));
+    .catch(e => addError(dispatch, e))
+    .finally(stopLoading);
 }

@@ -22,7 +22,7 @@ function Entry({token, entry, data, dispatch}) {
   };
 
   return (
-    <tr>
+    <tr className={entry.loadingRequests && entry.loadingRequests.length && "entry-loading"}>
       <ConnectedEditableProperty entryId={entry.id} propertyName="book_id">
         {entry.book_id}
       </ConnectedEditableProperty>

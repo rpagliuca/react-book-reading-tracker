@@ -1,10 +1,11 @@
 import * as rs from 'reactstrap';
 import React, { useRef, useEffect, useState } from 'react';
 import { patchProperty } from './../model/api.js';
-import { connectWithToken } from './../model/actions.js';
-export const ConnectedEditableProperty = connectWithToken(EditableProperty);
+import { connectWithData, connectWithToken } from './../model/actions.js';
+export const ConnectedEditableProperty = connectWithData(connectWithToken(EditableProperty));
 
-function EditableProperty({token, entryId, propertyName, children, dataParser, dispatch}) {
+function EditableProperty({data, token, entryId, propertyName, children, dataParser, dispatch}) {
+  console.log(children);
   const [value, setValue] = useState(children);
   const [isEditing, setIsEditing] = useState(false);
   const ref = useRef();
@@ -17,7 +18,7 @@ function EditableProperty({token, entryId, propertyName, children, dataParser, d
     if (!dataParser) {
       dataParser = (e) => e;
     }
-    patchProperty(token, entryId, propertyName, dataParser(value), dispatch);
+    patchProperty(data, token, entryId, propertyName, dataParser(value), dispatch);
     setIsEditing(false);
     e.preventDefault();
   };
@@ -25,8 +26,9 @@ function EditableProperty({token, entryId, propertyName, children, dataParser, d
   useEffect(() => {
     if (isEditing) {
       ref.current.focus();
-    };
-  });
+    }
+    setValue(children);
+  }, [isEditing, children]);
 
   const handleFocus = (event) => event.target.select();
 
@@ -38,7 +40,7 @@ function EditableProperty({token, entryId, propertyName, children, dataParser, d
     {isEditing && (
       <td>
         <rs.Form onSubmit={onSubmit}>
-          <rs.Input value={value} onChange={e => setValue(e.target.value)} innerRef={ref} onFocus={handleFocus}/>
+          <rs.Input value={value || ""} onChange={e => setValue(e.target.value)} innerRef={ref} onFocus={handleFocus}/>
         </rs.Form>
       </td>
     )}
