@@ -1,5 +1,6 @@
 import * as metrics from './../model/metrics.js';
 import * as charts from 'react-chartjs-2';
+import * as rs from 'reactstrap';
 import { connectWithData } from './../model/actions.js';
 
 function Metrics({data}) {
@@ -17,7 +18,7 @@ function Metrics({data}) {
         },
       }],
     },
-    aspectRatio: 6,
+    aspectRatio: 2.5,
   };
 
   const now = new Date();
@@ -45,10 +46,14 @@ function Metrics({data}) {
   }
 
   return (
-    <>
-      <charts.Line data={accumulatedPagesData} options={options} height={null} width={null}/>
-      <charts.Line data={newPagesData} options={options} height={null} width={null}/>
-    </>
+    <rs.Row>
+      <rs.Col md={6}>
+        <charts.Line data={accumulatedPagesData} options={options} height={null} width={null}/>
+      </rs.Col>
+      <rs.Col md={6}>
+        <charts.Line data={newPagesData} options={options} height={null} width={null}/>
+      </rs.Col>
+    </rs.Row>
   );
 }
 

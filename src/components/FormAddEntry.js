@@ -6,40 +6,17 @@ import { useInput, useCheckbox } from './../model/hooks.js';
 
 export const ConnectedFormAddEntry = connectWithCurrentBook(connectWithData(connectWithToken(FormAddEntry)));
 
-const dateAndTimeToDate = (data, hora) => {
-  var data_parts = data.split("/");
-  var hora_parts = hora.split(":");
-  var dt = new Date(
-    parseInt(data_parts[2], 10), // ano
-    parseInt(data_parts[1], 10) - 1, // mês começa com 0
-    parseInt(data_parts[0], 10), // dia
-    parseInt(hora_parts[0], 10), // hora
-    parseInt(hora_parts[1], 10), // minuto
-  );
-  return dt
-}
-
-const TimeRFC3339 = (usarHorarioManual, retornarAgora, data, hora) => {
-  if (usarHorarioManual) {
-    try {
-      return dateAndTimeToDate(data, hora).toISOString();
-    } catch (e) {
-      return ""
-    }
-  }
-  if (retornarAgora) {
-    return new Date().toISOString();
-  }
-  return ""
-};
-
 function FormAddEntry({token, data, currentBook, dispatch}) {
+
+  const onInicioDataBlur = (e) => {
+    setFimDataValue(e.target.value);
+  };
 
   const [fimDataInput, fimDataValue, setFimDataValue] = useInput("Data (DD/MM/AAAA)");
   const [fimHorarioInput, fimHorarioValue, setFimHorarioValue] = useInput("Hora (HH:MM)");
   const [fimPaginaInput, fimPaginaValue, setFimPaginaValue] = useInput("Página em que parei");
 
-  const [inicioDataInput, inicioDataValue, setInicioDataValue] = useInput("Data (DD/MM/AAAA)");
+  const [inicioDataInput, inicioDataValue, setInicioDataValue] = useInput("Data (DD/MM/AAAA)", onInicioDataBlur);
   const [inicioHorarioInput, inicioHorarioValue, setInicioHorarioValue] = useInput("Hora (HH:MM)");
   const [jaPareiCheckbox, jaPareiValue, setJaPareiValue] = useCheckbox("Fim retroativo", false, [setFimDataValue, setFimHorarioValue, setFimPaginaValue])
 
@@ -61,7 +38,7 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
     }
     addEntry(token, entry, data, dispatch);
 
-    setLivroValue("");
+    !currentBook && setLivroValue("");
     setInicioDataValue("");
     setInicioHorarioValue("");
     setInicioPaginaValue("");
@@ -143,3 +120,30 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
     </rs.Form>
   )
 }
+
+const dateAndTimeToDate = (data, hora) => {
+  var data_parts = data.split("/");
+  var hora_parts = hora.split(":");
+  var dt = new Date(
+    parseInt(data_parts[2], 10), // ano
+    parseInt(data_parts[1], 10) - 1, // mês começa com 0
+    parseInt(data_parts[0], 10), // dia
+    parseInt(hora_parts[0], 10), // hora
+    parseInt(hora_parts[1], 10), // minuto
+  );
+  return dt
+}
+
+const TimeRFC3339 = (usarHorarioManual, retornarAgora, data, hora) => {
+  if (usarHorarioManual) {
+    try {
+      return dateAndTimeToDate(data, hora).toISOString();
+    } catch (e) {
+      return ""
+    }
+  }
+  if (retornarAgora) {
+    return new Date().toISOString();
+  }
+  return ""
+};

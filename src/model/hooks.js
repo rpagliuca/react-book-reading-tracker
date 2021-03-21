@@ -2,10 +2,10 @@ import * as rs from 'reactstrap';
 
 import React, { useState } from 'react';
 
-export function useInput(placeholder) {
+export function useInput(placeholder, onBlur) {
   const [value, setValue] = useState("")
   return [
-    <rs.Input placeholder={placeholder} value={value} onChange={(e) => setValue(e.target.value)}/>,
+    <rs.Input onBlur={onBlur} placeholder={placeholder} value={value} onChange={(e) => setValue(e.target.value)}/>,
     value,
     setValue,
   ]
