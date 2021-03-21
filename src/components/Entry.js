@@ -21,8 +21,17 @@ function Entry({token, entry, data, dispatch}) {
     e.preventDefault();
   };
 
+  const isIncomplete = !(
+    entry &&
+    entry.book_id &&
+    entry.start_time &&
+    entry.end_time &&
+    entry.start_location &&
+    entry.end_location
+  );
+
   return (
-    <tr className={entry.loadingRequests && entry.loadingRequests.length && "entry-loading"}>
+    <tr className={(entry.loadingRequests && entry.loadingRequests.length && "entry-loading") || (isIncomplete && "entry-incomplete")}>
       <ConnectedEditableProperty entryId={entry.id} propertyName="book_id">
         {entry.book_id}
       </ConnectedEditableProperty>

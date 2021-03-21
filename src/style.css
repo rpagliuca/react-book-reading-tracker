@@ -41,3 +41,7 @@ b {
     font-size: 90%;
     color: gray;
 }
+
+.entry-incomplete {
+    background: #F8F7CF;
+}

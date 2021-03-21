@@ -32,6 +32,10 @@ export const accumulatedPerDate = (rawData, dateMax) => {
     return acc
   }, []);
 
+  if (!data || !data.length) {
+    return [];
+  }
+
   while (date(data[data.length-1].x) < date(dateMax)) {
     data.push({x: datePlus1(data[data.length-1].x), y: data[data.length-1].y});
   }
@@ -131,6 +135,10 @@ export const newPagesPerDate = (rawData, dateMax) => {
 
     return acc
   }, []);
+
+  if (!data || !data.length) {
+    return [];
+  }
 
   while (date(data[data.length-1].x) < date(dateMax)) {
     data.push({x: datePlus1(data[data.length-1].x), y: 0});
