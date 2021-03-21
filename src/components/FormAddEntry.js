@@ -69,6 +69,11 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
             <rs.Col sm={2}>
               {jaComeceiCheckbox}
             </rs.Col>
+
+            <rs.Col sm={2}>
+              {!jaComeceiValue && <rs.Button color="dark">Começar</rs.Button>}
+            </rs.Col>
+
           </rs.Row>
 
 
@@ -111,8 +116,7 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
             </>
           )}
 
-
-          <rs.Button color="dark">{(jaComeceiValue && "Adicionar registro") || "Começar"}</rs.Button>
+          {jaComeceiValue && <rs.Button color="dark">Adicionar registro</rs.Button>}
 
         </rs.CardBody>
       </rs.Card>
