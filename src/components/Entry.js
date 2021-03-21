@@ -2,22 +2,30 @@ import * as rs from 'reactstrap';
 import { ConnectedEditableProperty } from './EditableProperty.js';
 import { deleteEntry, stopEntry } from './../model/api.js';
 import { connectWithData } from './../model/actions.js';
+import { useState } from 'react';
 
 export const ConnectedEntry = connectWithData(Entry);
 
 function Entry({token, entry, data, dispatch}) {
 
-  const handleDelete = (e, id) => {
-    if (id) {
-      deleteEntry(token, id, data, dispatch);
-    };
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  const handleDeleteConfirm = () => {
+    deleteEntry(token, entry.id, data, dispatch);
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+  };
+
+  const handleDeleteModal = e => {
+    setShowDeleteModal(true);
     e.preventDefault();
   };
 
-  const handleStop = (e, entry) => {
-    if (entry.id) {
-      stopEntry(token, entry, data, dispatch);
-    };
+  const handleStop = e => {
+    stopEntry(token, entry, data, dispatch);
     e.preventDefault();
   };
 
@@ -48,7 +56,8 @@ function Entry({token, entry, data, dispatch}) {
         {entry.end_location}
       </ConnectedEditableProperty>
       <td>
-        <rs.Button color="light" onClick={(e) => handleDelete(e, entry.id)}>🗑️</rs.Button>
+        <DeleteModal handleCancel={handleDeleteCancel} handleConfirm={handleDeleteConfirm} showModal={showDeleteModal} />
+        <rs.Button color="light" onClick={(e) => handleDeleteModal(e, entry.id)}>🗑️</rs.Button>
         {!entry.end_time && <rs.Button color="light" onClick={(e) => handleStop(e, entry)}>⏱</rs.Button>}
       </td>
     </tr>
@@ -98,4 +107,20 @@ const pad = (num, len) => {
         str = "0" + str;
     }
     return str;
+}
+
+function DeleteModal({showModal, handleConfirm, handleCancel}) {
+
+  return (
+  <rs.Modal isOpen={showModal}>
+    <rs.ModalHeader>Confirmar</rs.ModalHeader>
+    <rs.ModalBody>
+      Deseja mesmo excluir?
+    </rs.ModalBody>
+    <rs.ModalFooter>
+      <rs.Button color="primary" onClick={handleConfirm}>Excluir</rs.Button>{' '}
+      <rs.Button color="secondary" onClick={handleCancel}>Cancelar</rs.Button>
+    </rs.ModalFooter>
+  </rs.Modal>
+  );
 }
