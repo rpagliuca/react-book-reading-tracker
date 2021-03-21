@@ -85,9 +85,9 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
                 {livroInput}
             </rs.Col>
 
-            <rs.Col sm={4}>
+            {!jaComeceiValue && <rs.Col sm={4}>
               {inicioPaginaInput}
-            </rs.Col>
+            </rs.Col>}
 
             <rs.Col sm={2}>
               {jaComeceiCheckbox}
@@ -105,6 +105,9 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
             </rs.Col>
             <rs.Col sm={3}>
               {inicioHorarioInput}
+            </rs.Col>
+            <rs.Col sm={3}>
+              {inicioPaginaInput}
             </rs.Col>
             <rs.Col sm={2}>
               {jaPareiCheckbox}
@@ -124,7 +127,7 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
             <rs.Col sm={3}>
               {fimHorarioInput}
             </rs.Col>
-            <rs.Col sm={6}>
+            <rs.Col sm={3}>
               {fimPaginaInput}
             </rs.Col>
           </rs.Row>
@@ -132,7 +135,7 @@ function FormAddEntry({token, data, currentBook, dispatch}) {
           )}
 
 
-          <rs.Button color="dark">Adicionar registro</rs.Button>
+          <rs.Button color="dark">{(jaComeceiValue && "Adicionar registro") || "Começar"}</rs.Button>
 
         </rs.CardBody>
       </rs.Card>
