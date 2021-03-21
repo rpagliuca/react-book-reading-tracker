@@ -10,7 +10,7 @@ export const updateToken = token => {
 }
 
 const sort = data => {
-  if (!data || data.length == 0) {
+  if (!data || data.length === 0) {
     return data;
   }
   const sorted = data.sort((a, b) => {
