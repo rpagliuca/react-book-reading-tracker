@@ -3,7 +3,7 @@ import * as charts from 'react-chartjs-2';
 import { connectWithData } from './../model/actions.js';
 
 function Metrics({data}) {
-  if (!data) {
+  if (!data || !data.length) {
     return null;
   }
 

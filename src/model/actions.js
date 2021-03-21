@@ -1,6 +1,8 @@
 import * as store from './store.js';
 import { connect } from 'react-redux';
 import { v4 as uuidv4 } from 'uuid';
+import { bookTitlesFromData } from './distinct-book-titles.js';
+import { filterDataByBook } from './filter-by-book.js';
 
 export const updateToken = token => {
   return {
@@ -45,6 +47,13 @@ export const clearErrors = (dispatch) => {
   });
 }
 
+export const filterByBook = (dispatch, book) => {
+  dispatch({
+    type: store.TYPE_FILTER_BY_BOOK,
+    book: book
+  });
+}
+
 export const showLoading = (dispatch, entryId) => {
   const requestId = uuidv4();
 
@@ -64,5 +73,6 @@ export const showLoading = (dispatch, entryId) => {
 }
 
 export const connectWithToken = fn => connect((state) => {return {token: state.token}})(fn);
-export const connectWithData = fn => connect((state) => {return {data: state.data}})(fn);
+export const connectWithData = fn => connect((state) => {return {data: filterDataByBook(state.data, state.filterByBook)}})(fn);
 export const connectWithErrors = fn => connect((state) => {return {errors: state.errors}})(fn);
+export const connectWithBookTitles = fn => connect((state) => {return {bookTitles: bookTitlesFromData(state.data)}})(fn);

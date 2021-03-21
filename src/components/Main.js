@@ -5,6 +5,7 @@ import { ConnectedPastEntries } from './PastEntries.js'
 import { ConnectedFormLogin } from './FormLogin.js'
 import { ConnectedErrors } from './Errors.js'
 import { ConnectedMetrics } from './Metrics.js'
+import { ConnectedFilter } from './Filter.js'
 import { connectWithToken } from './../model/actions.js';
 
 function Main({token}) {
@@ -15,6 +16,7 @@ function Main({token}) {
       <ConnectedErrors/>
       {token && (
         <>
+        <ConnectedFilter/>
         <ConnectedFormAddEntry/>
         <ConnectedMetrics/>
         <ConnectedPastEntries/>

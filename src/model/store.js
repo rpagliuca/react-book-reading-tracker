@@ -6,8 +6,9 @@ export const TYPE_ADD_ERROR = "TYPE_ADD_ERROR";
 export const TYPE_CLEAR_ERRORS = "TYPE_CLEAR_ERRORS";
 export const TYPE_SHOW_LOADING = "TYPE_SHOW_LOADING";
 export const TYPE_STOP_LOADING = "TYPE_STOP_LOADING";
+export const TYPE_FILTER_BY_BOOK = "TYPE_FILTER_BY_BOOK";
 
-const reducer = (state = {errors: [], token: null, data: null}, action) => {
+const reducer = (state = {errors: [], token: null, data: null, filterByBook: null}, action) => {
 
   let newState;
   let errors;
@@ -64,6 +65,11 @@ const reducer = (state = {errors: [], token: null, data: null}, action) => {
     newState = {...state};
     newState.errors = [];
     return newState;
+  } else if (action.type === TYPE_FILTER_BY_BOOK) {
+    return {
+      ...state,
+      filterByBook: action.book,
+    }
   }
   return state
 }
