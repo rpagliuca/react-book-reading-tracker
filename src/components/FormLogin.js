@@ -11,7 +11,7 @@ function FormLogin({token, dispatch}) {
   }
 
   const onGoogleLoginFailure = response => {
-    dispatch(addError("Erro ao fazer login com Google"))
+   addError(dispatch, "Erro ao fazer login com Google");
   }
 
   if (!token) {
