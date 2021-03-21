@@ -60,6 +60,13 @@ export const filterByBook = (dispatch, book) => {
   });
 }
 
+export const deleteEntry = (dispatch, id) => {
+  dispatch({
+    type: store.TYPE_DELETE_ENTRY,
+    entryId: id,
+  });
+}
+
 export const addEntry = (dispatch, entry) => {
   dispatch({
     type: store.TYPE_ADD_ENTRY,

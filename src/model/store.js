@@ -9,6 +9,7 @@ export const TYPE_STOP_LOADING = "TYPE_STOP_LOADING";
 export const TYPE_FILTER_BY_BOOK = "TYPE_FILTER_BY_BOOK";
 export const TYPE_LOGOUT = "TYPE_LOGOUT";
 export const TYPE_ADD_ENTRY = "TYPE_ADD_ENTRY";
+export const TYPE_DELETE_ENTRY = "TYPE_DELETE_ENTRY";
 
 const reducer = (state = {errors: [], token: null, data: null, filterByBook: null}, action) => {
 
@@ -78,6 +79,12 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
   } else if (action.type === TYPE_ADD_ENTRY) {
     newData = [...state.data];
     newData.push(action.entry);
+    return {
+      ...state,
+      data: sort(newData),
+    }
+  } else if (action.type === TYPE_DELETE_ENTRY) {
+    newData = state.data.filter(i => i.id !== action.entryId);
     return {
       ...state,
       data: sort(newData),

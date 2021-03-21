@@ -61,14 +61,12 @@ export function stopEntry(token, entry, data, dispatch) {
   }); 
 
   const onSuccess = d => {
-    console.log("haia");
     if (d.success) {
       const newData = [...data];
       const idx = newData.findIndex(i => i.id === entry.id);
       const newEntry = {...newData[idx]};
       newEntry.end_time = end_time;
       newData[idx] = newEntry;
-      console.log(newEntry);
       setData(dispatch, newData);
     } else {
       addError(dispatch, "Error onSuccess do stopEntry");
@@ -96,8 +94,7 @@ export function deleteEntry(token, id, data, dispatch) {
 
   const onSuccess = d => {
     if (d.success) {
-      const newData = data.filter(i => i.id !== id);
-      setData(dispatch, newData);
+      actions.deleteEntry(dispatch, id);
     } else {
       addError(dispatch, "Error onSuccess do deleteEntry");
     }
@@ -127,14 +124,12 @@ export function patchProperty(data, token, entryId, propertyName, value, dispatc
   }); 
 
   const onSuccess = d => {
-    console.log("haia");
     if (d.success) {
       const newData = [...data];
       const idx = newData.findIndex(i => i.id === entryId);
       const newEntry = {...newData[idx]};
       newEntry[propertyName] = value;
       newData[idx] = newEntry;
-      console.log(newEntry);
       setData(dispatch, newData);
     } else {
       addError(dispatch, "error onsuccess do patchproperty");
