@@ -33,6 +33,7 @@ export function addEntry(token, entry, data, dispatch) {
 
   const onSuccess = d => {
     if (d.success) {
+      entry.id = d.id;
       actions.addEntry(dispatch, entry);
     } else {
       actions.addError(dispatch, "Error onSuccess do addEntry");
