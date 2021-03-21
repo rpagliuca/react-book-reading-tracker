@@ -60,6 +60,13 @@ export const filterByBook = (dispatch, book) => {
   });
 }
 
+export const addEntry = (dispatch, entry) => {
+  dispatch({
+    type: store.TYPE_ADD_ENTRY,
+    entry: entry
+  });
+}
+
 export const showLoading = (dispatch, entryId) => {
   const requestId = uuidv4();
 

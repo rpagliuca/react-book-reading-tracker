@@ -1,4 +1,5 @@
 import { showLoading, setData, addError } from './actions.js';
+import * as actions from './actions.js';
 
 const ENTRIES_ENDPOINT = "https://ikhizussk2.execute-api.us-east-1.amazonaws.com/dev/entries";
 
@@ -32,12 +33,9 @@ export function addEntry(token, entry, data, dispatch) {
 
   const onSuccess = d => {
     if (d.success) {
-      const newData = [...data];
-      entry.id = d.id;
-      newData.push(entry);
-      setData(dispatch, newData);
+      actions.addEntry(dispatch, entry);
     } else {
-      addError(dispatch, "Error onSuccess do addEntry");
+      actions.addError(dispatch, "Error onSuccess do addEntry");
     }
   };
 

@@ -8,10 +8,12 @@ export const TYPE_SHOW_LOADING = "TYPE_SHOW_LOADING";
 export const TYPE_STOP_LOADING = "TYPE_STOP_LOADING";
 export const TYPE_FILTER_BY_BOOK = "TYPE_FILTER_BY_BOOK";
 export const TYPE_LOGOUT = "TYPE_LOGOUT";
+export const TYPE_ADD_ENTRY = "TYPE_ADD_ENTRY";
 
 const reducer = (state = {errors: [], token: null, data: null, filterByBook: null}, action) => {
 
   let newState;
+  let newData;
   let errors;
   let data;
   let idx;
@@ -73,6 +75,13 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
     }
   } else if (action.type === TYPE_LOGOUT) {
     return {};
+  } else if (action.type === TYPE_ADD_ENTRY) {
+    newData = [...state.data];
+    newData.push(action.entry);
+    return {
+      ...state,
+      data: sort(newData),
+    }
   }
   return state
 }
@@ -80,3 +89,16 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
 export default configureStore({
   reducer: reducer
 });
+
+const sort = data => {
+  if (!data || data.length === 0) {
+    return data;
+  }
+  const sorted = [...data].sort((a, b) => {
+    if (a.start_time < b.start_time) {
+      return 1;
+    }
+    return -1;
+  });
+  return sorted;
+};
