@@ -1,5 +1,5 @@
 export const filterDataByBook = (data, book) => {
-  if (!data.length) return [];
+  if (!data || !data.length) return [];
   if (!book) return data;
   const filtered = [...data];
   return filtered.filter(i => {
