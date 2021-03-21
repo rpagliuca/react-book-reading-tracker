@@ -7,6 +7,7 @@ export const TYPE_CLEAR_ERRORS = "TYPE_CLEAR_ERRORS";
 export const TYPE_SHOW_LOADING = "TYPE_SHOW_LOADING";
 export const TYPE_STOP_LOADING = "TYPE_STOP_LOADING";
 export const TYPE_FILTER_BY_BOOK = "TYPE_FILTER_BY_BOOK";
+export const TYPE_LOGOUT = "TYPE_LOGOUT";
 
 const reducer = (state = {errors: [], token: null, data: null, filterByBook: null}, action) => {
 
@@ -70,6 +71,8 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
       ...state,
       filterByBook: action.book,
     }
+  } else if (action.type === TYPE_LOGOUT) {
+    return {};
   }
   return state
 }

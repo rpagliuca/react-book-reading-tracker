@@ -4,6 +4,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { bookTitlesFromData } from './distinct-book-titles.js';
 import { filterDataByBook } from './filter-by-book.js';
 
+export const logout = dispatch => {
+  dispatch({
+    type: store.TYPE_LOGOUT
+  });
+}
+
 export const updateToken = token => {
   return {
     type: store.TYPE_UPDATE_TOKEN,

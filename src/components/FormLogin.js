@@ -1,5 +1,5 @@
 import * as rs from 'reactstrap';
-import { addError, setData, updateToken } from './../model/actions.js';
+import { logout, addError, setData, updateToken } from './../model/actions.js';
 import { connectWithToken } from './../model/actions.js';
 import { GoogleLogin } from 'react-google-login';
 import { fetchEntries } from './../model/api.js';
@@ -43,7 +43,7 @@ function FormLogin({token, dispatch}) {
           <rs.Button onClick={handleRefresh} color="secondary">Atualizar</rs.Button>
         </rs.Col>
         <rs.Col md={{size: 1}}>
-          <rs.Button onClick={() => dispatch(updateToken(""))} color="secondary">Logout</rs.Button>
+          <rs.Button onClick={() => logout(dispatch) } color="secondary">Logout</rs.Button>
         </rs.Col>
       </rs.Row>
 
