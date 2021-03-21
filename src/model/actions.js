@@ -76,3 +76,4 @@ export const connectWithToken = fn => connect((state) => {return {token: state.t
 export const connectWithData = fn => connect((state) => {return {data: filterDataByBook(state.data, state.filterByBook)}})(fn);
 export const connectWithErrors = fn => connect((state) => {return {errors: state.errors}})(fn);
 export const connectWithBookTitles = fn => connect((state) => {return {bookTitles: bookTitlesFromData(state.data)}})(fn);
+export const connectWithCurrentBook = fn => connect((state) => {return {currentBook: (state.filterByBook || "")}})(fn);

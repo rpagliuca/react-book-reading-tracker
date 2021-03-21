@@ -1,4 +1,7 @@
 export const bookTitlesFromData = data => {
+  if (!data || !data.length) {
+    return [];
+  }
   const titleMap = data.reduce((acc, i) => {
     acc[i.book_id] = true;
     return acc;

@@ -1,9 +1,10 @@
 import * as rs from 'reactstrap';
 import { addEntry } from './../model/api.js';
-import { connectWithData, connectWithToken } from './../model/actions.js';
+import { connectWithCurrentBook, connectWithData, connectWithToken } from './../model/actions.js';
+import { useEffect } from 'react';
 import { useInput, useCheckbox } from './../model/hooks.js';
 
-export const ConnectedFormAddEntry = connectWithData(connectWithToken(FormAddEntry));
+export const ConnectedFormAddEntry = connectWithCurrentBook(connectWithData(connectWithToken(FormAddEntry)));
 
 const dateAndTimeToDate = (data, hora) => {
   var data_parts = data.split("/");
@@ -32,7 +33,7 @@ const TimeRFC3339 = (usarHorarioManual, retornarAgora, data, hora) => {
   return ""
 };
 
-function FormAddEntry({token, data, dispatch}) {
+function FormAddEntry({token, data, currentBook, dispatch}) {
 
   const [fimDataInput, fimDataValue, setFimDataValue] = useInput("Data (DD/MM/AAAA)");
   const [fimHorarioInput, fimHorarioValue, setFimHorarioValue] = useInput("Hora (HH:MM)");
@@ -45,6 +46,10 @@ function FormAddEntry({token, data, dispatch}) {
   const [livroInput, livroValue, setLivroValue] = useInput("Livro que vou ler agora");
   const [inicioPaginaInput, inicioPaginaValue, setInicioPaginaValue] = useInput("Página em que vou começar");
   const [jaComeceiCheckbox, jaComeceiValue, setJaComeceiValue] = useCheckbox("Início retroativo", false, [setInicioDataValue, setInicioHorarioValue, setJaPareiValue])
+
+  useEffect(() => {
+    setLivroValue(currentBook);
+  }, [setLivroValue, currentBook]);
 
   const handleSubmit = (e) => {
     const entry = {
