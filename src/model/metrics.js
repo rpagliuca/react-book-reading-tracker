@@ -73,27 +73,13 @@ const date = dateStr => {
   return "";
 }
 
-const formatDate = date => {
+export const formatDate = date => {
     const formatted = date.getFullYear()
       + "-" + pad((date.getMonth()+1), 2)
       + "-" + pad(date.getDate(), 2)
     ;
     return formatted;
 }
-
-export const calculateSummary = rawData => {
-  const now = new Date();
-  const data = {
-    datasets: [
-      {
-        label: 'Total acumulado de páginas lidas',
-        data: accumulatedPerDate(rawData, formatDate(now)),
-      },
-    ],
-  }
-  return data;
-
-};
 
 export const sort = data => {
   if (!data || data.length === 0) {

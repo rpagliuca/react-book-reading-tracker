@@ -6,7 +6,7 @@ function Metrics({data}) {
   if (!data) {
     return null;
   }
-  const summary = metrics.calculateSummary(data);
+
   const options = {
     scales: {
       xAxes: [{
@@ -19,7 +19,18 @@ function Metrics({data}) {
     },
     aspectRatio: 4,
   };
-  return <charts.Line data={summary} options={options} height={null} width={null}/>
+
+  const now = new Date();
+  const accumulatedPagesData = {
+    datasets: [
+      {
+        label: 'Total acumulado de páginas lidas',
+        data: metrics.accumulatedPerDate(data, metrics.formatDate(now)),
+      },
+    ],
+  }
+
+  return <charts.Line data={accumulatedPagesData} options={options} height={null} width={null}/>
 }
 
 export const ConnectedMetrics = connectWithData(Metrics);
