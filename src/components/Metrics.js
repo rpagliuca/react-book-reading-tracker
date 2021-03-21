@@ -17,20 +17,39 @@ function Metrics({data}) {
         },
       }],
     },
-    aspectRatio: 4,
+    aspectRatio: 6,
   };
 
   const now = new Date();
+
   const accumulatedPagesData = {
     datasets: [
       {
         label: 'Total acumulado de páginas lidas',
         data: metrics.accumulatedPerDate(data, metrics.formatDate(now)),
+        backgroundColor: 'rgba(67, 85, 163, 0.2)',
+        borderColor: 'rgba(67, 85, 163, 0.5)',
       },
     ],
   }
 
-  return <charts.Line data={accumulatedPagesData} options={options} height={null} width={null}/>
+  const newPagesData = {
+    datasets: [
+      {
+        label: 'Quantidade diária de páginas lidas',
+        data: metrics.newPagesPerDate(data, metrics.formatDate(now)),
+        backgroundColor: 'rgba(102, 151, 91, 0.2)',
+        borderColor: 'rgba(102, 151, 91, 0.5)',
+      },
+    ],
+  }
+
+  return (
+    <>
+      <charts.Line data={accumulatedPagesData} options={options} height={null} width={null}/>
+      <charts.Line data={newPagesData} options={options} height={null} width={null}/>
+    </>
+  );
 }
 
 export const ConnectedMetrics = connectWithData(Metrics);
