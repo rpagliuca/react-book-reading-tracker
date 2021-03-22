@@ -63,12 +63,7 @@ export function stopEntry(token, entry, data, dispatch) {
 
   const onSuccess = d => {
     if (d.success) {
-      const newData = [...data];
-      const idx = newData.findIndex(i => i.id === entry.id);
-      const newEntry = {...newData[idx]};
-      newEntry.end_time = end_time;
-      newData[idx] = newEntry;
-      setData(dispatch, newData);
+      actions.patchEntry(dispatch, entry.id, "end_time", end_time);
     } else {
       addError(dispatch, "Error onSuccess do stopEntry");
     }
@@ -126,12 +121,7 @@ export function patchProperty(data, token, entryId, propertyName, value, dispatc
 
   const onSuccess = d => {
     if (d.success) {
-      const newData = [...data];
-      const idx = newData.findIndex(i => i.id === entryId);
-      const newEntry = {...newData[idx]};
-      newEntry[propertyName] = value;
-      newData[idx] = newEntry;
-      setData(dispatch, newData);
+      actions.patchEntry(dispatch, entryId, propertyName, value);
     } else {
       addError(dispatch, "error onsuccess do patchproperty");
     }

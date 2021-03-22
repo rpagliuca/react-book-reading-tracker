@@ -74,6 +74,15 @@ export const addEntry = (dispatch, entry) => {
   });
 }
 
+export const patchEntry = (dispatch, entryId, propertyName, propertyValue) => {
+  dispatch({
+    type: store.TYPE_PATCH_ENTRY,
+    entryId,
+    propertyName,
+    propertyValue
+  });
+}
+
 export const showLoading = (dispatch, entryId) => {
   const requestId = uuidv4();
 

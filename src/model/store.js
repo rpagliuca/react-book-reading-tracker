@@ -10,6 +10,7 @@ export const TYPE_FILTER_BY_BOOK = "TYPE_FILTER_BY_BOOK";
 export const TYPE_LOGOUT = "TYPE_LOGOUT";
 export const TYPE_ADD_ENTRY = "TYPE_ADD_ENTRY";
 export const TYPE_DELETE_ENTRY = "TYPE_DELETE_ENTRY";
+export const TYPE_PATCH_ENTRY = "TYPE_PATCH_ENTRY";
 
 const reducer = (state = {errors: [], token: null, data: null, filterByBook: null}, action) => {
 
@@ -53,7 +54,10 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
       data: data
     }
   } else if (action.type === TYPE_STOP_LOADING) {
-    data = [...state.data];
+    data = [];
+    if (state.data && state.data.length) {
+      data = [...state.data];
+    }
     idx = data.findIndex(i => {
       return i.id === action.entryId;
     });
@@ -88,6 +92,18 @@ const reducer = (state = {errors: [], token: null, data: null, filterByBook: nul
     return {
       ...state,
       data: sort(newData),
+    }
+  } else if (action.type === TYPE_PATCH_ENTRY) {
+    newData = [...state.data];
+    idx = newData.findIndex(i => {
+      return i.id === action.entryId;
+    });
+    item = {...newData[idx]};
+    item[action.propertyName] = action.propertyValue;
+    newData[idx] = item;
+    return {
+      ...state,
+      data: newData
     }
   }
   return state
