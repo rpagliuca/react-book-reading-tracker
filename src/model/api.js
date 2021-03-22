@@ -46,24 +46,36 @@ export function addEntry(token, entry, data, dispatch) {
     .catch(e => addError(dispatch, e));
 }
 
-export function stopEntry(token, entry, data, dispatch) {
+export function stopEntry(token, entry, dateStop, pageStop, dispatch) {
 
   const headers = new Headers();
   headers.append("Authorization", "Bearer " + token);
 
-  const end_time = new Date().toISOString();
+  const body = {};
+
+  if (dateStop) {
+    body.end_time = dateStop;
+  }
+
+  const intPageStop = parseInt(pageStop, 10);
+  if (intPageStop) {
+    body.end_location = intPageStop;
+  }
 
   const req = new Request(ENTRIES_ENDPOINT + "/" + entry.id, {
     method: "PATCH",
     headers: headers,
-    body: JSON.stringify({
-      end_time: end_time
-    })
+    body: JSON.stringify(body)
   }); 
 
   const onSuccess = d => {
     if (d.success) {
-      actions.patchEntry(dispatch, entry.id, "end_time", end_time);
+      if (dateStop) {
+        actions.patchEntry(dispatch, entry.id, "end_time", dateStop);
+      }
+      if (intPageStop) {
+        actions.patchEntry(dispatch, entry.id, "end_location", intPageStop);
+      }
     } else {
       addError(dispatch, "Error onSuccess do stopEntry");
     }

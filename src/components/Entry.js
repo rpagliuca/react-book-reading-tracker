@@ -3,12 +3,15 @@ import { ConnectedEditableProperty } from './EditableProperty.js';
 import { deleteEntry, stopEntry } from './../model/api.js';
 import { connectWithData } from './../model/actions.js';
 import { useState } from 'react';
+import { useInput } from './../model/hooks.js';
 
 export const ConnectedEntry = connectWithData(Entry);
 
 function Entry({token, entry, data, dispatch}) {
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showStopModal, setShowStopModal] = useState(false);
+  const [stopDate, setStopDate] = useState("");
 
   const handleDeleteConfirm = () => {
     deleteEntry(token, entry.id, data, dispatch);
@@ -24,8 +27,18 @@ function Entry({token, entry, data, dispatch}) {
     e.preventDefault();
   };
 
-  const handleStop = e => {
-    stopEntry(token, entry, data, dispatch);
+  const handleStopConfirm = (stopPage) => {
+    stopEntry(token, entry, stopDate, stopPage, dispatch);
+    setShowStopModal(false);
+  };
+
+  const handleStopCancel = () => {
+    setShowStopModal(false);
+  };
+
+  const handleStopModal = e => {
+    setShowStopModal(true);
+    setStopDate(new Date().toISOString());
     e.preventDefault();
   };
 
@@ -57,8 +70,9 @@ function Entry({token, entry, data, dispatch}) {
       </ConnectedEditableProperty>
       <td>
         <DeleteModal handleCancel={handleDeleteCancel} handleConfirm={handleDeleteConfirm} showModal={showDeleteModal} />
+        <StopModal handleCancel={handleStopCancel} handleConfirm={handleStopConfirm} showModal={showStopModal} stopDate={stopDate} />
         <rs.Button color="light" onClick={(e) => handleDeleteModal(e, entry.id)}>🗑️</rs.Button>
-        {!entry.end_time && <rs.Button color="light" onClick={(e) => handleStop(e, entry)}>⏱</rs.Button>}
+        {!entry.end_time && <rs.Button color="light" onClick={(e) => handleStopModal(e, entry)}>⏱</rs.Button>}
       </td>
     </tr>
   );
@@ -109,8 +123,39 @@ const pad = (num, len) => {
     return str;
 }
 
-function DeleteModal({showModal, handleConfirm, handleCancel}) {
+function StopModal({showModal, handleConfirm, handleCancel, stopDate}) {
 
+  const [input, value] = useInput("Em que página você parou?");
+
+  const handleSubmit = e => {
+    handleConfirm(value);
+    e.preventDefault();
+  }
+
+  return (
+  <rs.Modal isOpen={showModal}>
+  <rs.Form onSubmit={handleSubmit}>
+    <rs.ModalHeader>Confirmar</rs.ModalHeader>
+    <rs.ModalBody>
+        <rs.FormGroup>
+          <rs.Label>
+            Horário de parada: {prettyDate(stopDate)}
+          </rs.Label>
+        </rs.FormGroup>
+        <rs.FormGroup>
+          {input}
+        </rs.FormGroup>
+    </rs.ModalBody>
+    <rs.ModalFooter>
+      <rs.Button color="primary" type="submit">Confirmar parada</rs.Button>{' '}
+      <rs.Button color="secondary" onClick={handleCancel}>Cancelar</rs.Button>
+    </rs.ModalFooter>
+  </rs.Form>
+  </rs.Modal>
+  );
+}
+
+function DeleteModal({showModal, handleConfirm, handleCancel}) {
   return (
   <rs.Modal isOpen={showModal}>
     <rs.ModalHeader>Confirmar</rs.ModalHeader>
@@ -118,7 +163,7 @@ function DeleteModal({showModal, handleConfirm, handleCancel}) {
       Deseja mesmo excluir?
     </rs.ModalBody>
     <rs.ModalFooter>
-      <rs.Button color="primary" onClick={handleConfirm}>Excluir</rs.Button>{' '}
+      <rs.Button color="primary" onClick={handleConfirm}>Confirmar exclusão</rs.Button>{' '}
       <rs.Button color="secondary" onClick={handleCancel}>Cancelar</rs.Button>
     </rs.ModalFooter>
   </rs.Modal>
