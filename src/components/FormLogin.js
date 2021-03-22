@@ -3,6 +3,7 @@ import { logout, addError, setData, updateToken } from './../model/actions.js';
 import { connectWithToken } from './../model/actions.js';
 import { GoogleLogin } from 'react-google-login';
 import { fetchEntries } from './../model/api.js';
+import { Youtube } from './Youtube.js';
 
 function FormLogin({token, dispatch}) {
 
@@ -16,8 +17,11 @@ function FormLogin({token, dispatch}) {
 
   if (!token) {
   return (
+    <>
       <rs.Row>
-        <rs.Col md={{size: 2, offset: 5}}>
+        <rs.Col>
+          <center>
+            Acesse seu <b>Diário de Leitura</b>:<br/><br/>
           <GoogleLogin
             clientId="656765689994-f29hh63in3j1362mom3ek00ukcmru8jq.apps.googleusercontent.com"
             buttonText="Login"
@@ -25,8 +29,17 @@ function FormLogin({token, dispatch}) {
             onFailure={onGoogleLoginFailure}
             cookiePolicy={'single_host_origin'}
           />
+          </center>
         </rs.Col>
       </rs.Row>
+      <br/><br/>
+      <rs.Row>
+        <rs.Col md={{size: 8, offset: 2}}>
+          Aprenda a usar:<br/><br/>
+          <Youtube/>
+        </rs.Col>
+      </rs.Row>
+    </>
   );
   } else {
 
