@@ -2,7 +2,7 @@ import * as rs from 'reactstrap';
 import { ConnectedEditableProperty } from './EditableProperty.js';
 import { deleteEntry, stopEntry } from './../model/api.js';
 import { connectWithData } from './../model/actions.js';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useInput } from './../model/hooks.js';
 
 export const ConnectedEntry = connectWithData(Entry);
@@ -12,6 +12,7 @@ function Entry({token, entry, data, dispatch}) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showStopModal, setShowStopModal] = useState(false);
   const [stopDate, setStopDate] = useState("");
+  const chronoInputRef = useRef();
 
   const handleDeleteConfirm = () => {
     deleteEntry(token, entry.id, data, dispatch);
@@ -37,6 +38,7 @@ function Entry({token, entry, data, dispatch}) {
   };
 
   const handleStopModal = e => {
+    chronoInputRef.select();
     setShowStopModal(true);
     setStopDate(new Date().toISOString());
     e.preventDefault();
@@ -125,7 +127,7 @@ const pad = (num, len) => {
 
 function StopModal({showModal, handleConfirm, handleCancel, stopDate}) {
 
-  const [input, value] = useInput("Em que página você parou?");
+  const [input, value] = useInput("Em que página você parou?", null, chronoInputRef);
 
   const handleSubmit = e => {
     handleConfirm(value);
